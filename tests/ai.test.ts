@@ -55,6 +55,26 @@ describe("Gemini provider", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it("retries when Gemini is briefly overloaded", async () => {
+    vi.useFakeTimers();
+    fetchMock.mockResolvedValueOnce(geminiReply("high demand", 503)).mockResolvedValueOnce(geminiReply('{"answer":"ok"}'));
+    const pending = gemini.generateJson(credentials, request);
+    await vi.runAllTimersAsync(); // skip the wait between attempts
+    expect(await pending).toEqual({ answer: "ok" });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
+  it("explains an overload that does not clear", async () => {
+    vi.useFakeTimers();
+    fetchMock.mockImplementation(async () => geminiReply("high demand", 503));
+    const pending = gemini.generateJson(credentials, request).catch((e: Error) => e);
+    await vi.runAllTimersAsync();
+    expect(await pending).toMatchObject({ status: 503, message: expect.stringMatching(/overloaded/) });
+    expect(fetchMock).toHaveBeenCalledTimes(3); // first try + two retries
+    vi.useRealTimers();
+  });
+
   it("turns HTTP errors into readable messages", async () => {
     fetchMock.mockResolvedValueOnce(geminiReply("quota", 429));
     await expect(gemini.generateJson(credentials, request)).rejects.toMatchObject({ status: 429 });

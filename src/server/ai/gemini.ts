@@ -12,6 +12,15 @@ import type { AiMessage, AiProvider, JsonRequest, ProviderCredentials } from "./
 const BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 const TIMEOUT_MS = 90_000;
 
+/**
+ * Gemini answers 503 ("high demand") or another 5xx when it is briefly
+ * overloaded. These usually clear within seconds, so we wait and try again
+ * before giving up. Waits in milliseconds, one entry per retry.
+ */
+const RETRY_DELAYS_MS = [1_000, 3_000];
+const isOverloaded = (status: number) => status === 500 || status === 502 || status === 503 || status === 504;
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 /** The parts of Gemini's response we read. */
 interface GeminiResponse {
   candidates?: {
@@ -24,16 +33,21 @@ interface GeminiResponse {
 
 async function call(path: string, apiKey: string, body?: unknown): Promise<unknown> {
   let response: Response;
-  try {
-    response = await fetch(`${BASE_URL}/${path}`, {
-      method: body ? "POST" : "GET",
-      // The key goes in a header, not the URL, so it never ends up in logs.
-      headers: { "x-goog-api-key": apiKey, "content-type": "application/json" },
-      body: body ? JSON.stringify(body) : undefined,
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
-  } catch {
-    throw new AiError("Could not reach Gemini. Check the connection and try again.");
+  for (let attempt = 0; ; attempt++) {
+    try {
+      response = await fetch(`${BASE_URL}/${path}`, {
+        method: body ? "POST" : "GET",
+        // The key goes in a header, not the URL, so it never ends up in logs.
+        headers: { "x-goog-api-key": apiKey, "content-type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined,
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      });
+    } catch {
+      throw new AiError("Could not reach Gemini. Check the connection and try again.");
+    }
+    const delay = RETRY_DELAYS_MS[attempt];
+    if (!isOverloaded(response.status) || delay === undefined) break;
+    await wait(delay);
   }
 
   const data = (await response.json().catch(() => ({}))) as GeminiResponse;
@@ -51,6 +65,13 @@ async function call(path: string, apiKey: string, body?: unknown): Promise<unkno
   }
   if (response.status === 429) {
     throw new AiError("Gemini is rate-limiting this key (or the free quota is used up). Try again later.", 429);
+  }
+  if (isOverloaded(response.status)) {
+    throw new AiError(
+      "Gemini is overloaded right now (this is on Google's side). Try again in a minute, " +
+        "or pick a different model in Settings.",
+      503,
+    );
   }
   throw new AiError(`Gemini returned an error (${response.status}): ${detail}`);
 }
