@@ -6,7 +6,7 @@
  * browser just plays it (see src/components/lesson/LessonPlayer.tsx).
  */
 import type { Phrase } from "./content/types";
-import { normalizeRomaji, plainText, tiles as wordTiles } from "./japanese";
+import { normalizeRomaji, plainText, tileTokens, tiles as wordTiles, type Tile } from "./japanese";
 
 /**
  * The kinds of exercise, from easiest to hardest:
@@ -26,7 +26,7 @@ export type Exercise =
   | { kind: "listen"; phraseId: string; options: string[] }
   | { kind: "reverse"; phraseId: string; options: string[] }
   | { kind: "reply"; phraseId: string; answerId: string; options: string[] }
-  | { kind: "arrange"; phraseId: string; tiles: string[] }
+  | { kind: "arrange"; phraseId: string; tiles: Tile[] }
   | { kind: "type"; phraseId: string };
 
 export type GradedExercise = Exclude<Exercise, { kind: "intro" }>;
@@ -131,16 +131,19 @@ function canType(phrase: Phrase): boolean {
 }
 
 function arrange(phrase: Phrase, near: Phrase[], rng: Rng): GradedExercise {
-  const correct = wordTiles(phrase.jp);
+  const correct = tileTokens(phrase.jp);
+  const correctTexts = new Set(correct.map((t) => t.text));
   // A couple of words from other sentences make it less of a pure jigsaw.
-  const extras = shuffle(
-    [...new Set(near.flatMap((p) => wordTiles(p.jp)))].filter((w) => !correct.includes(w)),
-    rng,
-  ).slice(0, EXTRA_TILES);
+  const seen = new Set<string>();
+  const candidates = near
+    .flatMap((p) => tileTokens(p.jp))
+    .filter((t) => !correctTexts.has(t.text) && !seen.has(t.text) && seen.add(t.text));
+  const extras = shuffle(candidates, rng).slice(0, EXTRA_TILES);
 
+  const text = (list: Tile[]) => list.map((t) => t.text).join("");
   let mixed = shuffle([...correct, ...extras], rng);
   // Avoid handing over the tiles already in the right order.
-  for (let tries = 0; tries < 5 && mixed.slice(0, correct.length).join("") === correct.join(""); tries++) {
+  for (let tries = 0; tries < 5 && text(mixed.slice(0, correct.length)) === text(correct); tries++) {
     mixed = shuffle(mixed, rng);
   }
   return { kind: "arrange", phraseId: phrase.id, tiles: mixed };

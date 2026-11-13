@@ -81,11 +81,23 @@ export function stripPunctuation(s: string): string {
   return s.replace(PUNCTUATION, "");
 }
 
-/** Word tiles for the arrange exercise: ["駅", "は", "どこ", "です", "か"]. */
-export function tiles(markup: string): string[] {
+/** One draggable word in the arrange exercise. */
+export interface Tile {
+  text: string;
+  /** Kana reading, shown as furigana on the tile when it differs from `text`. */
+  reading: string;
+}
+
+/** Word tiles with readings: [{ text: "駅", reading: "えき" }, ...]. */
+export function tileTokens(markup: string): Tile[] {
   return parseJp(markup)
-    .map((t) => stripPunctuation(t.text))
-    .filter(Boolean);
+    .map((t) => ({ text: stripPunctuation(t.text), reading: stripPunctuation(t.reading) }))
+    .filter((t) => t.text);
+}
+
+/** Just the tile texts: ["駅", "は", "どこ", "です", "か"]. */
+export function tiles(markup: string): string[] {
+  return tileTokens(markup).map((t) => t.text);
 }
 
 /**

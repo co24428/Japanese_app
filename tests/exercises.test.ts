@@ -48,7 +48,8 @@ describe("buildLessonSession", () => {
           }
           if (e.kind === "arrange") {
             const correct = tiles(get(e.phraseId).jp);
-            for (const t of correct) expect(e.tiles).toContain(t);
+            const offered = e.tiles.map((t) => t.text);
+            for (const t of correct) expect(offered).toContain(t);
             expect(isArrangementCorrect(correct, get(e.phraseId))).toBe(true);
           }
         }
