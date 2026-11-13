@@ -1,0 +1,188 @@
+/*
+ * Global styles.
+ *
+ * Colours are CSS variables so light and dark mode share every component:
+ * change a value here and the whole app follows. Tailwind exposes them as
+ * utilities through the @theme block (bg-surface, text-muted, ...).
+ */
+@import "tailwindcss";
+
+:root {
+  --bg: #f6f4ef; /* page background */
+  --surface: #ffffff; /* cards */
+  --surface-2: #efece4; /* inset areas, unselected controls */
+  --ink: #1e2330; /* main text */
+  --muted: #667085; /* secondary text */
+  --line: #e2ded3; /* borders */
+
+  --primary: #3f51d6; /* buttons, links, active tab */
+  --primary-strong: #3141b8; /* button edge / hover */
+  --primary-soft: #e8ebff; /* selected option background */
+  --on-primary: #ffffff;
+
+  --good: #238a53; /* correct answers */
+  --good-soft: #e1f4e8;
+  --bad: #cf3f36; /* wrong answers */
+  --bad-soft: #fdeceb;
+  --warn: #c2760a; /* streak flame, hints */
+  --warn-soft: #fff3d6;
+
+  /* Heatmap squares, level 0 (nothing) to 4 (a lot). */
+  --heat-0: #e9e6dd;
+  --heat-1: #b9e3c6;
+  --heat-2: #7cc895;
+  --heat-3: #3f9f62;
+  --heat-4: #1d6b3f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12141a;
+    --surface: #1b1e26;
+    --surface-2: #252934;
+    --ink: #eceef3;
+    --muted: #9aa3b2;
+    --line: #313644;
+
+    --primary: #8794ff;
+    --primary-strong: #6b79f0;
+    --primary-soft: #262c52;
+    --on-primary: #10121a;
+
+    --good: #4cc98a;
+    --good-soft: #17301f;
+    --bad: #ff7a70;
+    --bad-soft: #3a1d1b;
+    --warn: #f2b23e;
+    --warn-soft: #36290f;
+
+    --heat-0: #252934;
+    --heat-1: #1f4a33;
+    --heat-2: #2a7049;
+    --heat-3: #3ba168;
+    --heat-4: #63d695;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-soft: var(--primary-soft);
+  --color-on-primary: var(--on-primary);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Apple SD Gothic Neo",
+    "Malgun Gothic", sans-serif;
+}
+
+html {
+  color-scheme: light dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*
+ * Japanese text. Kanji look slightly different in Japanese, Korean and
+ * Chinese fonts. Marking text with lang="ja" (the <Jp> component does this)
+ * and listing Japanese fonts first makes devices set to Korean show the
+ * Japanese shapes.
+ */
+:lang(ja) {
+  font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", "Noto Sans CJK JP",
+    Meiryo, sans-serif;
+}
+
+/* Furigana: the small kana above kanji. */
+ruby {
+  ruby-position: over;
+}
+rt {
+  font-size: 0.5em;
+  font-weight: 400;
+  color: var(--muted);
+  user-select: none;
+}
+
+/*
+ * Reusable component classes (btn-primary, card, input ...).
+ * In Tailwind v4 custom classes are declared with @utility, which also lets
+ * one build on another with @apply.
+ */
+/* Buttons have a darker bottom edge and sink when pressed. */
+@utility btn {
+  @apply inline-flex min-h-12 cursor-pointer items-center whitespace-nowrap justify-center gap-2 rounded-2xl px-5 text-base font-bold
+    transition-[transform,background-color,border-color] select-none
+    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
+    active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 disabled:active:translate-y-0;
+}
+@utility btn-primary {
+  @apply btn border-b-4 border-primary-strong bg-primary text-on-primary active:border-b-2;
+}
+@utility btn-good {
+  @apply btn border-b-4 border-[color-mix(in_srgb,var(--good)_75%,black)] bg-good text-white active:border-b-2;
+}
+@utility btn-bad {
+  @apply btn border-b-4 border-[color-mix(in_srgb,var(--bad)_75%,black)] bg-bad text-white active:border-b-2;
+}
+@utility btn-secondary {
+  @apply btn border-2 border-b-4 border-line bg-surface text-ink active:border-b-2;
+}
+@utility btn-ghost {
+  @apply btn min-h-10 px-3 font-semibold text-muted hover:bg-surface-2;
+}
+@utility btn-sm {
+  @apply min-h-10 rounded-xl px-3.5 text-sm;
+}
+
+@utility card {
+  @apply rounded-3xl border border-line bg-surface p-5;
+}
+
+@utility input {
+  @apply min-h-12 w-full rounded-2xl border-2 border-line bg-surface px-4 text-base text-ink
+    placeholder:text-muted focus:border-primary focus:outline-none;
+}
+
+@utility label {
+  @apply mb-1.5 block text-sm font-semibold text-muted;
+}
+
+/* Small all-caps heading above a section. */
+@utility eyebrow {
+  @apply text-xs font-bold tracking-wider text-muted uppercase;
+}
+
+/* Respect the "reduce motion" accessibility setting. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.animate-pop-in {
+  animation: pop-in 0.18s ease-out;
+}
