@@ -36,5 +36,5 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // Run on everything except Next.js build files and the app icons/manifest,
   // which the browser must be able to load on the login page.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|manifest.webmanifest).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon|icons/|apple-icon|manifest.webmanifest).*)"],
 };

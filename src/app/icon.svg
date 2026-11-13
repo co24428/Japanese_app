@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- App icon: a torii gate. Drawn with shapes only, so it looks the same on every device. -->
+  <rect width="512" height="512" rx="112" fill="#3f51d6"/>
+  <g fill="#ffffff">
+    <path d="M84 134 Q256 174 428 134 L436 180 Q256 212 76 180 Z"/>
+    <rect x="122" y="232" width="268" height="30" rx="6"/>
+    <rect x="244" y="198" width="24" height="40"/>
+    <rect x="158" y="192" width="38" height="216" rx="8"/>
+    <rect x="316" y="192" width="38" height="216" rx="8"/>
+  </g>
+</svg>
