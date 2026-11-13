@@ -94,12 +94,20 @@ export async function getReviewSummary(today: string): Promise<ReviewSummary> {
   return row ?? { due: 0, practised: 0, learned: 0 };
 }
 
-/** Phrases to review now, weakest and most overdue first. */
-export async function getDuePhrases(today: string, limit: number): Promise<{ phrase: Phrase; box: number }[]> {
+/**
+ * Phrases to review now, weakest and most overdue first.
+ * With `includeNotDue`, phrases that are not due yet are included as well
+ * (the "practise anyway" button).
+ */
+export async function getDuePhrases(
+  today: string,
+  limit: number,
+  includeNotDue = false,
+): Promise<{ phrase: Phrase; box: number }[]> {
   const rows = await query<StatRow>(
     `SELECT phrase_id, box, due::text AS due FROM phrase_stats
-     WHERE due <= $1::date ORDER BY box, due LIMIT $2`,
-    [today, limit],
+     WHERE due <= $1::date OR $3::boolean ORDER BY box, due LIMIT $2`,
+    [today, limit, includeNotDue],
   );
   const byId = new Map((await getAllPhrases()).map((p) => [p.id, p]));
   // A phrase can be missing if its lesson was deleted or edited: skip it.
