@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Local secrets. Copy .env.example to .env.local and fill it in.
+.env
+.env.local
+.env.*.local
+
+# Embedded dev database (created automatically when DATABASE_URL is not set)
+.data/
+
+.vercel/
+.DS_Store
+npm-debug.log*
