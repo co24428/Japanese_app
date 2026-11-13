@@ -14,8 +14,27 @@ const bodySchema = z.object({ password: z.string().min(1).max(200) });
 const MAX_FAILURES = 8;
 const WINDOW_MINUTES = 15;
 
+/**
+ * Names the deployment settings that are still missing, so a half-finished
+ * setup shows a useful message on the login page instead of a generic error.
+ * Only the names are revealed, never any values.
+ */
+function missingSetup(): string[] {
+  if (process.env.NODE_ENV !== "production") return []; // dev has built-in defaults
+  const missing: string[] = [];
+  if (!process.env.APP_PASSWORD) missing.push("APP_PASSWORD");
+  if (!process.env.APP_SECRET) missing.push("APP_SECRET");
+  if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL) missing.push("DATABASE_URL (create a Postgres database)");
+  return missing;
+}
+
 export const POST = api(
   async (request) => {
+    const missing = missingSetup();
+    if (missing.length > 0) {
+      throw new ApiError(503, `Setup is not finished. Missing on the server: ${missing.join(", ")}. Add them, then redeploy.`);
+    }
+
     const { password } = await readJson(request, bodySchema);
 
     // Slow down password guessing. The counter is global because the app has
