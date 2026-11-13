@@ -60,6 +60,14 @@ async function call(path: string, apiKey: string, body?: unknown): Promise<unkno
   if (response.status === 401 || response.status === 403) {
     throw new AiError("Gemini rejected the API key. Check it in Settings.", 400);
   }
+  if (response.status === 402) {
+    // The key's Google project is on prepaid billing and has no credit left.
+    throw new AiError(
+      "Your Gemini API project has no credit left. Add credit in Google AI Studio (Billing), " +
+        "or switch to another provider in Settings. A Gemini app subscription does not cover API use.",
+      402,
+    );
+  }
   if (response.status === 404) {
     throw new AiError("The selected Gemini model does not exist. Pick another one in Settings.", 400);
   }
