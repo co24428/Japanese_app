@@ -1,6 +1,8 @@
 /** /review: how many phrases are due, and a button to start reviewing. */
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FORWARD, PageTransition } from "@/components/PageTransition";
+import { CountUp } from "@/components/ui/CountUp";
 import { BOX_INTERVALS } from "@/lib/srs";
 import { getReviewSummary } from "@/server/progress";
 import { getToday } from "@/server/today";
@@ -11,7 +13,8 @@ export default async function ReviewPage() {
   const summary = await getReviewSummary(await getToday());
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
+    <div className="stagger space-y-6">
       <header>
         <h1 className="text-2xl font-extrabold">Review</h1>
         <p className="mt-1 text-muted">
@@ -31,9 +34,11 @@ export default async function ReviewPage() {
           </>
         ) : summary.due > 0 ? (
           <>
-            <p className="text-6xl font-black text-primary tabular-nums">{summary.due}</p>
+            <p className="text-6xl font-black text-primary tabular-nums">
+              <CountUp value={summary.due} />
+            </p>
             <h2 className="mt-1 text-lg font-bold">phrase{summary.due === 1 ? "" : "s"} due for review</h2>
-            <Link href="/review/session" className="btn-primary mt-5 w-full sm:w-auto sm:px-10">
+            <Link href="/review/session" transitionTypes={FORWARD} className="btn-primary mt-5 w-full sm:w-auto sm:px-10">
               Start review
             </Link>
           </>
@@ -42,7 +47,7 @@ export default async function ReviewPage() {
             <p className="text-5xl" aria-hidden="true">✅</p>
             <h2 className="mt-3 text-lg font-bold">All caught up</h2>
             <p className="mx-auto mt-1 max-w-sm text-muted">Nothing is due today. You can still practise your weakest phrases.</p>
-            <Link href="/review/session?all=1" className="btn-secondary mt-5">
+            <Link href="/review/session?all=1" transitionTypes={FORWARD} className="btn-secondary mt-5">
               Practise anyway
             </Link>
           </>
@@ -69,5 +74,6 @@ export default async function ReviewPage() {
         </p>
       </section>
     </div>
+    </PageTransition>
   );
 }

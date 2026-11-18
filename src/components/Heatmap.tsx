@@ -21,6 +21,8 @@ function describe(day: string, xp: number): string {
 }
 
 export function Heatmap({ data }: { data: HeatmapData }) {
+  // The last non-future square is today; it gets an outline.
+  const today = data.weeks.flat().filter((c) => !c.future).at(-1)?.day;
   return (
     <div>
       <div className="flex gap-2">
@@ -57,7 +59,10 @@ export function Heatmap({ data }: { data: HeatmapData }) {
                   <span
                     key={cell.day}
                     title={cell.future ? undefined : describe(cell.day, cell.xp)}
-                    className="size-3 rounded-[3px]"
+                    // Hovering a square enlarges it; the native tooltip shows the date and XP.
+                    className={`size-3 rounded-[3px] transition-transform duration-150 ${
+                      cell.future ? "" : "hover:z-10 hover:scale-150 hover:ring-2 hover:ring-ink/30"
+                    } ${cell.day === today ? "ring-2 ring-ink/40 ring-offset-1 ring-offset-surface" : ""}`}
                     style={{ background: cell.future ? "transparent" : LEVEL_COLORS[cell.level] }}
                   />
                 ))}

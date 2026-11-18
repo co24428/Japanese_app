@@ -41,7 +41,7 @@ function Chart({ rows }: { rows: (KanaCell | null)[][] }) {
             key={cell.kana}
             type="button"
             onClick={() => speak(cell.kana, 0.8)}
-            className="flex cursor-pointer flex-col items-center rounded-2xl border border-line bg-surface py-2.5 transition-transform active:scale-95"
+            className="flex cursor-pointer flex-col items-center rounded-2xl border-2 border-b-4 border-line bg-surface py-2.5 transition-[translate,border-color,background-color] duration-150 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary-soft active:translate-y-0.5 active:border-b-2"
           >
             <span lang="ja" className="text-2xl font-bold">
               {cell.kana}
@@ -150,7 +150,7 @@ export function KanaTrainer() {
             Quit
           </button>
         </div>
-        <div className="card py-10 text-center">
+        <div key={index} className="card animate-pop-in py-10 text-center">
           <p lang="ja" className="text-8xl font-black">
             {question.cell.kana}
           </p>
@@ -166,7 +166,9 @@ export function KanaTrainer() {
                 type="button"
                 disabled={picked !== null}
                 onClick={() => pick(option)}
-                className={`min-h-14 cursor-pointer rounded-2xl border-2 border-b-4 text-xl font-bold disabled:cursor-default ${look}`}
+                className={`min-h-14 cursor-pointer rounded-2xl border-2 border-b-4 text-xl font-bold transition-[translate,border-color] duration-150 hover:enabled:-translate-y-0.5 hover:enabled:border-primary/50 active:enabled:translate-y-0.5 active:enabled:border-b-2 disabled:cursor-default ${look} ${
+                  picked && option === question.cell.romaji ? "animate-bounce-in" : picked === option ? "animate-shake" : ""
+                }`}
               >
                 {option}
               </button>

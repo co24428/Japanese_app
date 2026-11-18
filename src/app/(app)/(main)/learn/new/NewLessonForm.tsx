@@ -61,7 +61,9 @@ export function NewLessonForm() {
               key={idea}
               type="button"
               onClick={() => setTopic(idea)}
-              className="cursor-pointer rounded-full border border-line bg-surface-2 px-3 py-1.5 text-sm hover:border-primary"
+              className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm transition-[translate,border-color,background-color] duration-150 hover:-translate-y-px hover:border-primary active:scale-95 ${
+                topic === idea ? "border-primary bg-primary-soft font-semibold text-primary" : "border-line bg-surface-2"
+              }`}
             >
               {idea}
             </button>

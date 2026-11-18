@@ -104,15 +104,19 @@ export function TalkClient() {
           </p>
         </header>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          {SCENARIOS.map((s) => (
+        <div className="stagger grid gap-3 sm:grid-cols-2">
+          {SCENARIOS.map((s, i) => (
             <button
               key={s.id}
               type="button"
               onClick={() => start(s)}
-              className="card flex cursor-pointer items-center gap-4 text-left transition-colors hover:border-primary"
+              style={{ "--i": i } as React.CSSProperties}
+              className="card-link group flex items-center gap-4 text-left"
             >
-              <span className="text-3xl" aria-hidden="true">
+              <span
+                className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-surface-2 text-3xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
+                aria-hidden="true"
+              >
                 {s.emoji}
               </span>
               <span>
@@ -211,8 +215,14 @@ export function TalkClient() {
         )}
 
         {busy && (
-          <li className="text-sm text-muted" role="status">
-            {bubbles.length === 0 ? "Setting the scene…" : "Thinking…"}
+          <li className="animate-pop-in flex items-center gap-2" role="status">
+            {/* Three bouncing dots, like a messaging app. */}
+            <span className="flex items-center gap-1 rounded-3xl rounded-tl-md border border-line bg-surface px-4 py-3.5" aria-hidden="true">
+              {[0, 1, 2].map((d) => (
+                <span key={d} className="typing-dot size-2 rounded-full bg-muted" style={{ animationDelay: `${d * 0.15}s` }} />
+              ))}
+            </span>
+            <span className="text-sm text-muted">{bubbles.length === 0 ? "Setting the scene…" : "Typing…"}</span>
           </li>
         )}
       </ol>
@@ -252,7 +262,7 @@ export function TalkClient() {
                 type="button"
                 // Fills the text box (in romaji) so you can still edit it before sending.
                 onClick={() => setInput(s.romaji)}
-                className="cursor-pointer rounded-2xl border border-line bg-surface px-4 py-2.5 text-left hover:border-primary"
+                className="cursor-pointer rounded-2xl border-2 border-b-4 border-line bg-surface px-4 py-2.5 text-left transition-[translate,border-color] duration-150 hover:-translate-y-0.5 hover:border-primary/50 active:translate-y-0.5 active:border-b-2"
               >
                 <Jp markup={s.jp} className="block leading-loose font-bold" />
                 <span className="block text-sm text-muted">

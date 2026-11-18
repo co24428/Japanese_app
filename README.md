@@ -123,3 +123,5 @@ Do not change a lesson's `id` after you have studied it, because progress is sto
 - Audio uses the browser's built-in Japanese voice. Phones and Macs have a good one. If a device has none, listening exercises turn into reading exercises, and Settings tells you.
 - The default Claude model is `claude-opus-5-5` and the default Gemini model is `gemini-flash-latest`. In Settings, **List** shows the models your key can use, and you can pick a faster or cheaper one.
 - Role-play conversations are not saved; leaving the page ends the scene.
+- Sound effects (chimes for right and wrong answers) can be turned off in Settings. Page animations follow the system "reduce motion" setting.
+- Page transitions use the browser's View Transitions API. Browsers without it switch pages instantly; everything else works the same.

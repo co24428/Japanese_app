@@ -1,6 +1,7 @@
 /** /learn/new: describe a situation and let the AI write a lesson for it. */
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BACK, PageTransition } from "@/components/PageTransition";
 import { AiSetupNotice } from "@/components/AiSetupNotice";
 import { getAiStatus } from "@/server/settings";
 import { NewLessonForm } from "./NewLessonForm";
@@ -10,9 +11,10 @@ export const metadata: Metadata = { title: "Create a lesson" };
 export default async function NewLessonPage() {
   const ai = await getAiStatus();
   return (
+    <PageTransition>
     <div className="space-y-6">
       <header>
-        <Link href="/learn" className="text-sm font-semibold text-primary">
+        <Link href="/learn" transitionTypes={BACK} className="text-sm font-semibold text-primary hover:underline">
           ← Learn
         </Link>
         <h1 className="mt-2 text-2xl font-extrabold">Create a lesson</h1>
@@ -23,5 +25,6 @@ export default async function NewLessonPage() {
       </header>
       {ai.ready ? <NewLessonForm /> : <AiSetupNotice />}
     </div>
+    </PageTransition>
   );
 }
