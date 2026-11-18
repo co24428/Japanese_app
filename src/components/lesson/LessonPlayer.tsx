@@ -12,6 +12,10 @@
  *   - After the last exercise the results are posted to /api/progress and
  *     the completion screen is shown.
  *
+ * Feedback: a chime and bounce for a right answer, a buzz and shake for a
+ * wrong one (sounds can be turned off in Settings), and a combo counter for
+ * several right answers in a row.
+ *
  * Keyboard: 1-4 pick an option, Enter checks / continues.
  */
 import Link from "next/link";
@@ -20,8 +24,9 @@ import type { Phrase } from "@/lib/content/types";
 import { isArrangementCorrect, testedPhraseId, type Exercise } from "@/lib/exercises";
 import { isAnswerCorrect, plainText } from "@/lib/japanese";
 import { callApi } from "@/lib/client/fetch";
+import { buzz, playSound } from "@/lib/client/sounds";
 import { speak, stopSpeaking, useVoiceStatus } from "@/lib/client/speech";
-import { CheckIcon, CloseIcon } from "../icons";
+import { CheckIcon, CloseIcon, FlameIcon } from "../icons";
 import { usePrefs } from "../PrefsProvider";
 import { ArrangeView, ChoiceView, IntroView, TypeView, type Status } from "./ExerciseViews";
 import { PhraseCard } from "./PhraseCard";
@@ -39,6 +44,14 @@ interface Props {
   exitHref: string;
 }
 
+/** Varied praise, so "Correct!" does not get repetitive. Longer combos get louder praise. */
+function praise(combo: number): string {
+  if (combo >= 5) return `${combo} in a row! 🔥`;
+  if (combo >= 3) return "On a roll!";
+  const words = ["Correct!", "Nice!", "Great job!", "Well done!", "That's it!"];
+  return words[combo % words.length]!;
+}
+
 interface QueueItem {
   exercise: Exercise;
   /** True for a repeat of an exercise that was answered wrongly. */
@@ -46,7 +59,7 @@ interface QueueItem {
 }
 
 export function LessonPlayer({ mode, lessonId, title, exercises: initialExercises, phrases: initialPhrases, exitHref }: Props) {
-  const { speechRate } = usePrefs();
+  const { speechRate, soundEffects } = usePrefs();
   const voice = useVoiceStatus();
 
   // Keep the session we started with. The server shuffles a NEW session each
@@ -60,6 +73,8 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
   const [index, setIndex] = useState(0);
   const [status, setStatus] = useState<Status>("answering");
   const [mistakes, setMistakes] = useState(0);
+  // Right answers in a row; shown as a combo badge from 3 upwards.
+  const [combo, setCombo] = useState(0);
 
   // The answer being entered. Only one of these is used per exercise kind.
   const [selected, setSelected] = useState<string | null>(null); // multiple choice
@@ -134,9 +149,14 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
       results.current.set(tested, (results.current.get(tested) ?? true) && correct);
     }
     setStatus(correct ? "correct" : "wrong");
-    // Hearing the right answer straight away helps it stick.
-    speak(plainText(phrase(tested).jp), speechRate);
-  }, [exercise, canCheck, chosen, typed, selected, current, speechRate]);
+    setCombo((c) => (correct ? c + 1 : 0));
+    playSound(correct ? "correct" : "wrong", soundEffects);
+    if (!correct) buzz(soundEffects);
+    // Hearing the right answer straight away helps it stick. Wait for the
+    // chime to finish so the two do not overlap.
+    const answer = plainText(phrase(tested).jp);
+    window.setTimeout(() => speak(answer, speechRate), soundEffects ? 450 : 0);
+  }, [exercise, canCheck, chosen, typed, selected, current, speechRate, soundEffects]);
 
   const next = useCallback(() => {
     if (!current) return;
@@ -151,11 +171,12 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
 
     if (index + 1 >= updated.length) {
       setFinished(true);
+      playSound("complete", soundEffects);
       void save();
     } else {
       setIndex(index + 1);
     }
-  }, [current, status, queue, index, save]);
+  }, [current, status, queue, index, save, soundEffects]);
 
   // Keyboard shortcuts.
   useEffect(() => {
@@ -231,12 +252,32 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
           aria-valuemin={0}
           aria-valuemax={100}
         >
-          <div className="h-full rounded-full bg-good transition-[width] duration-300" style={{ width: `${percent}%` }} />
+          {/* The bar glows while a combo is running. */}
+          <div
+            className={`relative h-full rounded-full bg-good transition-[width] duration-500 ease-out ${combo >= 3 ? "shine" : ""}`}
+            style={{ width: `${percent}%` }}
+          >
+            {/* A lighter stripe along the top gives the bar some depth. */}
+            <span className="absolute inset-x-2 top-1 h-1 rounded-full bg-white/30" />
+          </div>
         </div>
+        {combo >= 3 && (
+          <span
+            key={combo}
+            className="animate-bounce-in flex shrink-0 items-center gap-0.5 rounded-full bg-warn-soft px-2.5 py-1 text-sm font-extrabold text-warn tabular-nums"
+            title={`${combo} right answers in a row`}
+          >
+            <FlameIcon className="size-4" />
+            {combo}
+          </span>
+        )}
       </header>
 
       {/* The exercise. `key` restarts the entrance animation for each one. */}
-      <main key={index} className="animate-pop-in flex-1 px-4 pt-4 pb-6 sm:px-6">
+      <main
+        key={index}
+        className={`flex-1 px-4 pt-4 pb-6 sm:px-6 ${status === "wrong" ? "animate-shake" : status === "correct" ? "" : "animate-pop-in"}`}
+      >
         {exercise.kind === "intro" && <IntroView phrases={exercise.phraseIds.map(phrase)} />}
 
         {"options" in exercise && (
@@ -247,12 +288,24 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
             answerId={testedPhraseId(exercise)}
             selected={selected}
             status={status}
-            onSelect={setSelected}
+            onSelect={(id) => {
+              setSelected(id);
+              playSound("tap", soundEffects);
+            }}
           />
         )}
 
         {exercise.kind === "arrange" && (
-          <ArrangeView prompt={phrase(exercise.phraseId)} tiles={exercise.tiles} chosen={chosen} status={status} onChange={setChosen} />
+          <ArrangeView
+            prompt={phrase(exercise.phraseId)}
+            tiles={exercise.tiles}
+            chosen={chosen}
+            status={status}
+            onChange={(next) => {
+              setChosen(next);
+              playSound("tap", soundEffects);
+            }}
+          />
         )}
 
         {exercise.kind === "type" && (
@@ -272,10 +325,16 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
         aria-live="polite"
       >
         {status !== "answering" && answerPhrase && (
-          <div className="animate-pop-in mb-4">
+          <div className="animate-slide-up mb-4">
             <p className={`mb-2 flex items-center gap-2 text-lg font-extrabold ${status === "correct" ? "text-good" : "text-bad"}`}>
-              {status === "correct" ? <CheckIcon /> : <CloseIcon />}
-              {status === "correct" ? "Correct!" : "Not quite. The answer is:"}
+              <span
+                className={`animate-bounce-in flex size-8 items-center justify-center rounded-full text-white ${
+                  status === "correct" ? "bg-good" : "bg-bad"
+                }`}
+              >
+                {status === "correct" ? <CheckIcon className="size-5" /> : <CloseIcon className="size-5" />}
+              </span>
+              {status === "correct" ? praise(combo) : "Not quite. The answer is:"}
             </p>
             <PhraseCard phrase={answerPhrase} compact />
           </div>

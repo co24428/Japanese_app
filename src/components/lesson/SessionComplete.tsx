@@ -2,6 +2,8 @@
 /** The celebration screen after a lesson or review session. */
 import Link from "next/link";
 import { FlameIcon } from "../icons";
+import { Confetti } from "../ui/Confetti";
+import { CountUp } from "../ui/CountUp";
 
 export interface Outcome {
   xp: number;
@@ -23,8 +25,9 @@ export function SessionComplete({ mode, outcome, exitHref }: Props) {
   const goalReached = outcome.todayXp >= outcome.dailyGoal;
 
   return (
-    <div className="animate-pop-in mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-10 text-center">
-      <p className="text-7xl" aria-hidden="true">
+    <div className="stagger mx-auto flex min-h-dvh max-w-md flex-col justify-center px-6 py-10 text-center">
+      <Confetti />
+      <p className="animate-bounce-in text-7xl" aria-hidden="true">
         {outcome.perfect ? "🏆" : "🎉"}
       </p>
       <h1 className="mt-4 text-3xl font-black">
@@ -36,11 +39,15 @@ export function SessionComplete({ mode, outcome, exitHref }: Props) {
 
       <div className="mt-8 grid grid-cols-3 gap-3">
         <div className="rounded-2xl bg-warn-soft px-2 py-4">
-          <p className="text-2xl font-extrabold text-warn tabular-nums">+{outcome.xp}</p>
+          <p className="text-2xl font-extrabold text-warn tabular-nums">
+            <CountUp value={outcome.xp} prefix="+" />
+          </p>
           <p className="text-xs font-semibold text-muted">XP</p>
         </div>
         <div className="rounded-2xl bg-good-soft px-2 py-4">
-          <p className="text-2xl font-extrabold text-good tabular-nums">{outcome.accuracy}%</p>
+          <p className="text-2xl font-extrabold text-good tabular-nums">
+            <CountUp value={outcome.accuracy} />%
+          </p>
           <p className="text-xs font-semibold text-muted">First try</p>
         </div>
         <div className="rounded-2xl bg-primary-soft px-2 py-4">
@@ -60,7 +67,9 @@ export function SessionComplete({ mode, outcome, exitHref }: Props) {
           </span>
         </div>
         <div className="mt-2 h-3 overflow-hidden rounded-full bg-surface-2">
-          <div className="h-full rounded-full bg-good" style={{ width: `${goalPercent}%` }} />
+          <div className="h-full" style={{ width: `${goalPercent}%` }}>
+            <div className={`animate-grow h-full rounded-full bg-good ${goalReached ? "shine" : ""}`} />
+          </div>
         </div>
       </div>
 

@@ -16,6 +16,8 @@ export const prefsSchema = z.object({
   dailyGoal: z.number().int().min(5).max(200),
   /** Speed of the spoken audio: 1 is normal. */
   speechRate: z.number().min(0.5).max(1.2),
+  /** Chimes for right and wrong answers, and a vibration on phones. */
+  soundEffects: z.boolean(),
 });
 
 export type Prefs = z.infer<typeof prefsSchema>;
@@ -26,6 +28,7 @@ export const DEFAULT_PREFS: Prefs = {
   meaning: "en",
   dailyGoal: DEFAULT_DAILY_GOAL,
   speechRate: 0.9,
+  soundEffects: true,
 };
 
 /** The two AI providers the app can talk to. */

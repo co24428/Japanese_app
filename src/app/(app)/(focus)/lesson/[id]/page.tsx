@@ -6,6 +6,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LessonPlayer } from "@/components/lesson/LessonPlayer";
+import { PageTransition } from "@/components/PageTransition";
 import { lessonPhrases, type Phrase } from "@/lib/content/types";
 import { buildLessonSession, referencedPhraseIds, seededRng } from "@/lib/exercises";
 import { getAllPhrases, getLesson } from "@/server/lessons";
@@ -32,6 +33,8 @@ export default async function LessonPage({ params }: Props) {
   for (const p of [...phrases, ...pool]) if (used.has(p.id)) lookup[p.id] = p;
 
   return (
-    <LessonPlayer mode="lesson" lessonId={lesson.id} title={lesson.title} exercises={exercises} phrases={lookup} exitHref="/learn" />
+    <PageTransition>
+      <LessonPlayer mode="lesson" lessonId={lesson.id} title={lesson.title} exercises={exercises} phrases={lookup} exitHref="/learn" />
+    </PageTransition>
   );
 }

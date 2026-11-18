@@ -5,6 +5,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { LessonPlayer } from "@/components/lesson/LessonPlayer";
+import { PageTransition } from "@/components/PageTransition";
 import type { Phrase } from "@/lib/content/types";
 import { buildReviewSession, referencedPhraseIds, seededRng } from "@/lib/exercises";
 import { getAllPhrases } from "@/server/lessons";
@@ -28,5 +29,9 @@ export default async function ReviewSessionPage({ searchParams }: { searchParams
   const lookup: Record<string, Phrase> = {};
   for (const p of pool) if (used.has(p.id)) lookup[p.id] = p;
 
-  return <LessonPlayer mode="review" title="Review" exercises={exercises} phrases={lookup} exitHref="/review" />;
+  return (
+    <PageTransition>
+      <LessonPlayer mode="review" title="Review" exercises={exercises} phrases={lookup} exitHref="/review" />
+    </PageTransition>
+  );
 }

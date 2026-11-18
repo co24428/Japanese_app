@@ -11,6 +11,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { callApi } from "@/lib/client/fetch";
+import { playSound } from "@/lib/client/sounds";
 import { speak, useVoiceStatus } from "@/lib/client/speech";
 import { PROVIDERS, PROVIDER_LABELS, type AiStatus, type Prefs, type Provider } from "@/lib/prefs";
 
@@ -285,6 +286,15 @@ export function SettingsClient({ initialPrefs, initialAi }: { initialPrefs: Pref
             hint="Pronunciation in English letters under the Japanese"
             checked={prefs.showRomaji}
             onChange={(v) => void update({ showRomaji: v })}
+          />
+          <Toggle
+            label="Sound effects"
+            hint="Chimes for right and wrong answers, and a short vibration on phones"
+            checked={prefs.soundEffects}
+            onChange={(v) => {
+              void update({ soundEffects: v });
+              playSound("correct", v); // a preview when switched on
+            }}
           />
           <Toggle
             label="Furigana"

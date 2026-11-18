@@ -32,8 +32,13 @@ export function IntroView({ phrases }: { phrases: Phrase[] }) {
     <div className="space-y-5">
       <Instruction>New phrases</Instruction>
       <p className="-mt-3 text-muted">Listen, then say them out loud.</p>
-      {phrases.map((phrase) => (
-        <div key={phrase.id} className={`card ${phrase.speaker === "B" ? "border-primary/40 bg-primary-soft/40" : ""}`}>
+      {phrases.map((phrase, i) => (
+        <div
+          key={phrase.id}
+          // The answer slides in a moment after the question.
+          className={`card animate-pop-in ${phrase.speaker === "B" ? "border-primary/40 bg-primary-soft/40 sm:ml-8" : "sm:mr-8"}`}
+          style={{ animationDelay: `${i * 120}ms` }}
+        >
           <PhraseCard phrase={phrase} label={phrase.speaker === "A" ? "Ask" : "Answer"} />
         </div>
       ))}
@@ -106,10 +111,11 @@ export function ChoiceView({ kind, prompt, options, answerId, selected, status, 
         {options.map((option, i) => {
           const isSelected = selected === option.id;
           // After checking: the right answer turns green, a wrong pick red.
-          let look = "border-line bg-surface hover:bg-surface-2";
-          if (status === "answering" && isSelected) look = "border-primary bg-primary-soft";
-          if (status !== "answering" && option.id === answerId) look = "border-good bg-good-soft";
+          let look = "border-line bg-surface hover:-translate-y-0.5 hover:border-primary/40 hover:bg-surface-2/60";
+          if (status === "answering" && isSelected) look = "border-primary bg-primary-soft -translate-y-0.5";
+          if (status !== "answering" && option.id === answerId) look = "border-good bg-good-soft animate-bounce-in";
           else if (status === "wrong" && isSelected) look = "border-bad bg-bad-soft";
+          else if (status !== "answering") look = "border-line bg-surface opacity-60";
 
           return (
             <button
@@ -119,9 +125,16 @@ export function ChoiceView({ kind, prompt, options, answerId, selected, status, 
               aria-checked={isSelected}
               disabled={status !== "answering"}
               onClick={() => onSelect(option.id)}
-              className={`flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border-2 border-b-4 px-4 py-2.5 text-left transition-colors disabled:cursor-default ${look}`}
+              style={{ animationDelay: status === "answering" ? `${i * 50}ms` : undefined }}
+              className={`group flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border-2 border-b-4 px-4 py-2.5 text-left transition-[translate,border-color,background-color,opacity] duration-150 active:translate-y-0.5 active:border-b-2 disabled:cursor-default ${
+                status === "answering" ? "animate-pop-in" : ""
+              } ${look}`}
             >
-              <span className="hidden size-7 shrink-0 items-center justify-center rounded-lg border border-line text-xs font-bold text-muted sm:flex">
+              <span
+                className={`hidden size-7 shrink-0 items-center justify-center rounded-lg border text-xs font-bold transition-colors sm:flex ${
+                  isSelected ? "border-primary bg-primary text-on-primary" : "border-line text-muted group-hover:border-primary/50"
+                }`}
+              >
                 {i + 1}
               </span>
               {japaneseOptions ? (
@@ -162,7 +175,7 @@ function TileButton({ tile, onClick, disabled, hidden }: { tile: Tile; onClick: 
       onClick={onClick}
       disabled={disabled || hidden}
       // A used tile keeps its space in the bank (invisible) so tiles do not jump around.
-      className={`min-h-12 cursor-pointer rounded-xl border-2 border-b-4 border-line bg-surface px-3.5 text-lg font-bold transition-transform active:translate-y-0.5 disabled:cursor-default ${
+      className={`animate-bounce-in min-h-12 cursor-pointer rounded-xl border-2 border-b-4 border-line bg-surface px-3.5 text-lg font-bold transition-[translate,border-color] duration-150 hover:enabled:-translate-y-0.5 hover:enabled:border-primary/50 active:translate-y-0.5 active:border-b-2 disabled:cursor-default ${
         hidden ? "invisible" : ""
       }`}
     >
@@ -190,7 +203,13 @@ export function ArrangeView({ prompt, tiles, chosen, status, onChange }: Arrange
       </Prompt>
 
       {/* The sentence being built. Tap a tile to send it back. */}
-      <div className="flex min-h-32 flex-wrap content-start gap-2 border-y-2 border-line py-3" aria-label="Your sentence">
+      <div
+        className={`flex min-h-32 flex-wrap content-start gap-2 rounded-2xl border-2 border-dashed p-3 transition-colors ${
+          chosen.length > 0 ? "border-primary/40 bg-primary-soft/30" : "border-line"
+        }`}
+        aria-label="Your sentence"
+      >
+        {chosen.length === 0 && <p className="self-center px-1 text-sm text-muted">Tap the words below in order</p>}
         {chosen.map((tileIndex, position) => (
           <TileButton
             key={tileIndex}
