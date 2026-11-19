@@ -108,3 +108,22 @@ export const HelpIcon = (p: Props) => (
     <path d="M12 17h.01" />
   </Icon>
 );
+export const TranslateIcon = (p: Props) => (
+  <Icon {...p}>
+    <path d="M4 5h9M8.5 3v2" />
+    <path d="M11 5c-.8 3.6-3.300 6.600-6.500 8" />
+    <path d="M6.500 8.500c1.200 2 3 3.300 5 4" />
+    <path d="M13 21l4-9 4 9M14.300 18h5.400" />
+  </Icon>
+);
+export const SearchIcon = (p: Props) => (
+  <Icon {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.500-3.500" />
+  </Icon>
+);
+export const BookmarkIcon = (p: Props) => (
+  <Icon {...p}>
+    <path d="M6 3h12v18l-6-4-6 4V3Z" />
+  </Icon>
+);

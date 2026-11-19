@@ -8,7 +8,7 @@ import { LessonPlayer } from "@/components/lesson/LessonPlayer";
 import { PageTransition } from "@/components/PageTransition";
 import type { Phrase } from "@/lib/content/types";
 import { buildReviewSession, referencedPhraseIds, seededRng } from "@/lib/exercises";
-import { getAllPhrases } from "@/server/lessons";
+import { getReviewablePhrases } from "@/server/lessons";
 import { getDuePhrases } from "@/server/progress";
 import { getToday } from "@/server/today";
 
@@ -22,7 +22,8 @@ export default async function ReviewSessionPage({ searchParams }: { searchParams
   const items = await getDuePhrases(await getToday(), SESSION_SIZE, includeNotDue);
   if (items.length === 0) redirect("/review");
 
-  const pool = await getAllPhrases();
+  // Includes saved dictionary words, so their wrong options come from other words.
+  const pool = await getReviewablePhrases();
   const exercises = buildReviewSession(items, pool, seededRng(Date.now()));
 
   const used = referencedPhraseIds(exercises);

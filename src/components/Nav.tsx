@@ -10,11 +10,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BACK, FORWARD } from "./PageTransition";
-import { BookIcon, ChatIcon, GearIcon, HomeIcon, RepeatIcon } from "./icons";
+import { BookIcon, ChatIcon, GearIcon, HomeIcon, RepeatIcon, TranslateIcon } from "./icons";
 
 const TABS = [
   { href: "/", label: "Home", icon: HomeIcon },
   { href: "/learn", label: "Learn", icon: BookIcon },
+  { href: "/words", label: "Words", icon: TranslateIcon },
   { href: "/review", label: "Review", icon: RepeatIcon },
   { href: "/talk", label: "Talk", icon: ChatIcon },
   { href: "/settings", label: "Settings", icon: GearIcon },

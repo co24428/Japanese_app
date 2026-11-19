@@ -3,6 +3,7 @@
  * (from the `lessons` table), presented as one list of units.
  */
 import { BUILTIN_UNITS, getBuiltinLesson } from "@/lib/content";
+import { DICTIONARY_PHRASES } from "@/lib/content/dictionary";
 import { lessonPhrases, type Lesson, type Phrase, type Unit } from "@/lib/content/types";
 import { query, transaction } from "./db";
 
@@ -47,10 +48,20 @@ export async function getLesson(id: string): Promise<Lesson | undefined> {
   return rows[0]?.data;
 }
 
-/** Every phrase of every lesson. Used for review lookups and wrong options. */
+/** Every phrase of every lesson. Used as wrong options in lesson exercises. */
 export async function getAllPhrases(): Promise<Phrase[]> {
   const units = await getUnits();
   return units.flatMap((u) => u.lessons).flatMap(lessonPhrases);
+}
+
+/**
+ * Everything the review queue can contain: lesson phrases plus dictionary
+ * words saved from the Words page. Dictionary words are kept out of
+ * getAllPhrases() so single words never appear as wrong options for
+ * whole sentences in a lesson.
+ */
+export async function getReviewablePhrases(): Promise<Phrase[]> {
+  return [...(await getAllPhrases()), ...DICTIONARY_PHRASES];
 }
 
 export async function saveCustomLesson(lesson: Lesson): Promise<void> {

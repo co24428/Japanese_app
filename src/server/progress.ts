@@ -10,7 +10,8 @@ import { LEARNED_BOX, nextReviewState } from "@/lib/srs";
 import type { DayActivity } from "@/lib/streak";
 import { XP } from "@/lib/xp";
 import { query, transaction, type Queryable } from "./db";
-import { getAllPhrases } from "./lessons";
+import { WORDS_LESSON_ID, wordPhraseId } from "@/lib/content/dictionary";
+import { getReviewablePhrases } from "./lessons";
 
 // ---------------------------------------------------------------------------
 // Daily activity
@@ -109,12 +110,40 @@ export async function getDuePhrases(
      WHERE due <= $1::date OR $3::boolean ORDER BY box, due LIMIT $2`,
     [today, limit, includeNotDue],
   );
-  const byId = new Map((await getAllPhrases()).map((p) => [p.id, p]));
+  const byId = new Map((await getReviewablePhrases()).map((p) => [p.id, p]));
   // A phrase can be missing if its lesson was deleted or edited: skip it.
   return rows.flatMap((r) => {
     const phrase = byId.get(r.phrase_id);
     return phrase ? [{ phrase, box: r.box }] : [];
   });
+}
+
+// ---------------------------------------------------------------------------
+// Dictionary words saved for review (Words page)
+// ---------------------------------------------------------------------------
+//
+// A saved word is simply a row in phrase_stats with lesson_id "words", so it
+// flows through the same review sessions and scheduling as lesson phrases.
+
+/** Dictionary entry ids (e.g. "bank") currently in the review queue. */
+export async function getSavedWordIds(): Promise<string[]> {
+  const rows = await query<{ phrase_id: string }>("SELECT phrase_id FROM phrase_stats WHERE lesson_id = $1", [WORDS_LESSON_ID]);
+  const prefix = `${WORDS_LESSON_ID}:`;
+  return rows.map((r) => r.phrase_id.slice(prefix.length));
+}
+
+/** Adds a word to the review queue, due today. Saving it again changes nothing. */
+export async function saveWordForReview(entryId: string, today: string): Promise<void> {
+  await query(
+    `INSERT INTO phrase_stats (phrase_id, lesson_id, box, due) VALUES ($1, $2, 0, $3::date)
+     ON CONFLICT (phrase_id) DO NOTHING`,
+    [wordPhraseId(entryId), WORDS_LESSON_ID, today],
+  );
+}
+
+/** Takes a word out of the review queue (its review history is deleted). */
+export async function removeWordFromReview(entryId: string): Promise<void> {
+  await query("DELETE FROM phrase_stats WHERE phrase_id = $1 AND lesson_id = $2", [wordPhraseId(entryId), WORDS_LESSON_ID]);
 }
 
 // ---------------------------------------------------------------------------
@@ -141,7 +170,7 @@ export interface SessionOutcome {
  * Everything happens in one transaction, so a failure leaves nothing half-saved.
  */
 export async function completeSession(session: SessionResult, today: string): Promise<SessionOutcome> {
-  const known = new Map((await getAllPhrases()).map((p) => [p.id, p]));
+  const known = new Map((await getReviewablePhrases()).map((p) => [p.id, p]));
 
   // A phrase may be tested several times in one session. It counts as
   // correct only if every attempt was correct.
