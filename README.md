@@ -2,11 +2,12 @@
 
 A personal web app for learning everyday Japanese conversation. It works on a laptop and on a phone, and is built for one user: a Korean speaker who is fluent in English.
 
-- **Lessons**: 10 real-life situations, 20 short dialogues, 120 phrases. Every phrase has Japanese with furigana, romaji, English and Korean, and audio.
+- **Lessons**: 14 real-life situations, 31 short dialogues, 188 phrases. Every phrase has Japanese with furigana, romaji, English and Korean, and audio. Each lesson opens with a "Key particles & words" preview and ends with a recap that breaks every sentence into word + particle blocks.
 - **Exercises**: pick the meaning, listen, choose the reply, put words in order, type the sentence. Mistakes come back before the lesson ends.
 - **Review**: spaced repetition brings each phrase back just before you would forget it.
 - **Tracking**: a GitHub-style activity map, streaks, and a daily XP goal.
 - **AI (your own Claude or Gemini key)**: role-play conversations with corrections, lessons written for any situation you describe, and "Explain" on any phrase with a comparison to Korean.
+- **Words**: an everyday dictionary (places, nature, clothes with their "wear" verb, verbs) with search and "Save to review", plus a particle cheat sheet mapping は, が, を, の, に, で to Korean 조사.
 - **Kana**: hiragana and katakana charts with audio and a quiz.
 
 Lessons, review, tracking and kana work without any AI key.
@@ -59,6 +60,9 @@ src/
     streak.ts       Streaks and the activity-map grid
     xp.ts           How much XP each activity is worth
     prefs.ts        Preferences and AI provider defaults
+    content/dictionary.ts  Words page dictionary and the "wear" verbs   <- add words here
+    content/particles.ts   Particle cheat sheet (Korean bridge)
+    grammar.ts      Particles and their Korean equivalents; splits sentences into word + particle chunks
     scenarios.ts    Role-play scenes for the Talk tab             <- add scenes here
     auth.ts         Login cookie signing
   server/         Runs only on the server.
@@ -69,7 +73,7 @@ src/
     api.ts          Wrapper used by every API route (login check, errors)
     ai/             Claude and Gemini providers, prompts, AI features
   app/            Pages and API routes (Next.js App Router).
-    (app)/(main)/   Pages with the navigation bar: home, learn, review, talk, kana, settings
+    (app)/(main)/   Pages with the navigation bar: home, learn, words, review, talk, kana, settings
     (app)/(focus)/  Full-screen pages: the lesson player
     api/            JSON endpoints called by the browser
     login/          The login page
@@ -92,7 +96,9 @@ Spaces separate words, and `[kanji|reading]` adds furigana. The display text, th
 
 ### Adding or editing lessons
 
-Edit the files in `src/lib/content/units/`. Each line is `[japanese, romaji, english, korean, optional note]`. To add a situation, create a new file there and add it to the list in `src/lib/content/index.ts`.
+Edit the files in `src/lib/content/units/`. Each line is `[japanese, romaji, english, korean, optional note]`. After the lines, a lesson can list its key words for the preview card as `[japanese, romaji, english, korean]`. To add a situation, create a new file there and add it to the list in `src/lib/content/index.ts`.
+
+Dictionary words live in `src/lib/content/dictionary.ts` as `[id, japanese, romaji, english, korean, optional note]`. The id is what "Save to review" stores, so never change an existing one.
 
 Then run the tests. They check every line: furigana on all kanji, and romaji that matches the reading.
 

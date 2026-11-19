@@ -9,6 +9,7 @@ import { LessonPlayer } from "@/components/lesson/LessonPlayer";
 import { PageTransition } from "@/components/PageTransition";
 import { lessonPhrases, type Phrase } from "@/lib/content/types";
 import { buildLessonSession, referencedPhraseIds, seededRng } from "@/lib/exercises";
+import { fallbackKeyWords, lessonParticles } from "@/lib/grammar";
 import { getAllPhrases, getLesson } from "@/server/lessons";
 
 type Props = { params: Promise<{ id: string }> };
@@ -34,7 +35,20 @@ export default async function LessonPage({ params }: Props) {
 
   return (
     <PageTransition>
-      <LessonPlayer mode="lesson" lessonId={lesson.id} title={lesson.title} exercises={exercises} phrases={lookup} exitHref="/learn" />
+      <LessonPlayer
+        mode="lesson"
+        lessonId={lesson.id}
+        title={lesson.title}
+        exercises={exercises}
+        phrases={lookup}
+        exitHref="/learn"
+        preview={{
+          goal: lesson.goal,
+          particles: lessonParticles(lesson.lines),
+          // Built-in lessons list their key words; AI lessons get kanji words picked automatically.
+          words: lesson.keyWords ?? fallbackKeyWords(lesson.lines),
+        }}
+      />
     </PageTransition>
   );
 }

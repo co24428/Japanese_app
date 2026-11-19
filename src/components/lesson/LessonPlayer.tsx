@@ -16,10 +16,14 @@
  * wrong one (sounds can be turned off in Settings), and a combo counter for
  * several right answers in a row.
  *
+ * Around the exercises (lessons only):
+ *   before  a "Key particles & words" preview (LessonIntro.tsx)
+ *   after   a sentence-structure recap on the completion screen (SentenceRecap.tsx)
+ *
  * Keyboard: 1-4 pick an option, Enter checks / continues.
  */
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Phrase } from "@/lib/content/types";
 import { isArrangementCorrect, testedPhraseId, type Exercise } from "@/lib/exercises";
 import { isAnswerCorrect, plainText } from "@/lib/japanese";
@@ -30,6 +34,8 @@ import { CheckIcon, CloseIcon, FlameIcon } from "../icons";
 import { usePrefs } from "../PrefsProvider";
 import { ArrangeView, ChoiceView, IntroView, TypeView, type Status } from "./ExerciseViews";
 import { PhraseCard } from "./PhraseCard";
+import { LessonIntro, type LessonPreview } from "./LessonIntro";
+import type { RecapItem } from "./SentenceRecap";
 import { SessionComplete, type Outcome } from "./SessionComplete";
 
 interface Props {
@@ -42,6 +48,8 @@ interface Props {
   phrases: Record<string, Phrase>;
   /** Where the close button and the final Continue button lead. */
   exitHref: string;
+  /** Key particles and words to show before the first exercise (lessons only). */
+  preview?: LessonPreview;
 }
 
 /** Varied praise, so "Correct!" does not get repetitive. Longer combos get louder praise. */
@@ -58,7 +66,15 @@ interface QueueItem {
   retry: boolean;
 }
 
-export function LessonPlayer({ mode, lessonId, title, exercises: initialExercises, phrases: initialPhrases, exitHref }: Props) {
+export function LessonPlayer({
+  mode,
+  lessonId,
+  title,
+  exercises: initialExercises,
+  phrases: initialPhrases,
+  exitHref,
+  preview,
+}: Props) {
   const { speechRate, soundEffects } = usePrefs();
   const voice = useVoiceStatus();
 
@@ -85,6 +101,25 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
   // should not re-render anything.
   const results = useRef(new Map<string, boolean>());
 
+  // False while the preview card is shown; exercises start after it.
+  const [started, setStarted] = useState(!preview);
+  const start = useCallback(() => setStarted(true), []);
+
+  /**
+   * The sentences this session practises, in the order they first appear
+   * (for the recap). Single dictionary words are left out: they have no
+   * sentence structure to show.
+   */
+  const recapIds = useMemo(() => {
+    const ids: string[] = [];
+    for (const e of exercises) {
+      for (const id of e.kind === "intro" ? e.phraseIds : [testedPhraseId(e)]) {
+        if (!ids.includes(id) && phrases[id]?.lessonId !== "words") ids.push(id);
+      }
+    }
+    return ids;
+  }, [exercises, phrases]);
+
   // After the last exercise: saving -> outcome (or an error to retry).
   const [finished, setFinished] = useState(false);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
@@ -100,12 +135,12 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
 
   // Speak new phrases and listening questions as soon as they appear.
   useEffect(() => {
-    if (!exercise || finished) return;
+    if (!exercise || finished || !started) return;
     if (exercise.kind === "intro") speak(plainText(phrase(exercise.phraseIds[0]!).jp), speechRate);
     if (exercise.kind === "listen") speak(plainText(phrase(exercise.phraseId).jp), speechRate);
     // Deliberately runs once per exercise: the other values used here do not
     // change during a session.
-  }, [index, finished]);
+  }, [index, finished, started]);
 
   // Stop any audio when leaving the page.
   useEffect(() => stopSpeaking, []);
@@ -181,7 +216,7 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
   // Keyboard shortcuts.
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (finished || !exercise) return;
+      if (finished || !exercise || !started) return;
       // Leave keys alone while an "Explain" sheet is open.
       if (document.querySelector('[role="dialog"]')) return;
 
@@ -196,12 +231,19 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [exercise, status, finished, next, check]);
+  }, [exercise, status, finished, started, next, check]);
 
   // ---- After the last exercise -------------------------------------------
 
   if (finished || !exercise || !kind) {
-    if (outcome) return <SessionComplete mode={mode} outcome={outcome} exitHref={exitHref} />;
+    if (outcome) {
+      const recap: RecapItem[] = recapIds.map((id) => ({
+        phrase: phrases[id]!,
+        // Only first tries are recorded; a sentence never tested counts as fine.
+        correct: results.current.get(id) ?? true,
+      }));
+      return <SessionComplete mode={mode} outcome={outcome} exitHref={exitHref} recap={recap} />;
+    }
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
         {saveError ? (
@@ -221,6 +263,12 @@ export function LessonPlayer({ mode, lessonId, title, exercises: initialExercise
         )}
       </div>
     );
+  }
+
+  // ---- Before the first exercise: the preview card ----------------------
+
+  if (!started && preview) {
+    return <LessonIntro title={title} preview={preview} exitHref={exitHref} onStart={start} />;
   }
 
   // ---- During the session --------------------------------------------------
