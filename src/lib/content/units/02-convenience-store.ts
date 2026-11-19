@@ -3,10 +3,10 @@ import { lesson } from "../helpers";
 
 export const convenienceStore: Unit = {
   id: "konbini",
-  title: "Convenience store",
+  title: "Convenience store and supermarket",
   titleJp: "コンビニ",
   emoji: "🏪",
-  description: "Answer the questions the clerk always asks.",
+  description: "Answer the clerk's questions, pay with an IC card, shop for groceries.",
   lessons: [
     lesson("konbini-1", "At the register", "Buy something and answer about bags and heating.", [
       ["いらっしゃいませ。", "Irasshaimase.", "Welcome.", "어서 오세요.",
@@ -18,6 +18,11 @@ export const convenienceStore: Unit = {
         "大丈夫です is the soft way to refuse, like 괜찮아요."],
       ["お[弁当|べんとう] を [温|あたた]めます か。", "Obentou o atatamemasu ka?", "Shall I heat up your lunch box?", "도시락 데워 드릴까요?"],
       ["はい、 お[願|ねが]いします。", "Hai, onegaishimasu.", "Yes, please.", "네, 부탁드립니다."],
+    ], [
+      ["[袋|ふくろ]", "fukuro", "bag", "봉투"],
+      ["お[弁当|べんとう]", "obentou", "lunch box", "도시락"],
+      ["[温|あたた]めます", "atatamemasu", "heat up", "데우다"],
+      ["[大丈夫|だいじょうぶ]", "daijoubu", "fine, OK", "괜찮음"],
     ]),
     lesson("konbini-2", "Paying", "Ask the price and pay by card.", [
       ["[全部|ぜんぶ] で いくら です か。", "Zenbu de ikura desu ka?", "How much is it altogether?", "전부 얼마예요?"],
@@ -27,6 +32,54 @@ export const convenienceStore: Unit = {
       ["はい、 こちら に タッチ して ください。", "Hai, kochira ni tatchi shite kudasai.", "Yes, please tap here.", "네, 여기에 터치해 주세요."],
       ["レシート は いります か。", "Reshiito wa irimasu ka?", "Do you need a receipt?", "영수증 필요하세요?"],
       ["はい、 ください。", "Hai, kudasai.", "Yes, please.", "네, 주세요."],
+    ], [
+      ["[全部|ぜんぶ]", "zenbu", "all, in total", "전부"],
+      ["[払|はら]えます", "haraemasu", "can pay", "지불할 수 있다"],
+      ["カード", "kaado", "card", "카드"],
+      ["レシート", "reshiito", "receipt", "영수증"],
     ]),
+    lesson(
+      "konbini-3",
+      "Point cards and IC cards",
+      "Answer the point-card question and pay with an IC card.",
+      [
+        ["ポイントカード は お[持|も]ち です か。", "Pointo kaado wa omochi desu ka?", "Do you have a point card?", "포인트 카드 있으세요?",
+          "Almost every shop asks this. お持ちですか is the polite 'do you have?'."],
+        ["いいえ、 [持|も]って いません。", "Iie, motte imasen.", "No, I don't have one.", "아니요, 없어요."],
+        ["お[支払|しはら]い は どう されます か。", "Oshiharai wa dou saremasu ka?", "How would you like to pay?", "결제는 어떻게 하시겠어요?"],
+        ["スイカ で お[願|ねが]いします。", "Suika de onegaishimasu.", "By Suica, please.", "스이카로 할게요.",
+          "Suica, PASMO and ICOCA are train IC cards that also pay in shops. で marks the means, like Korean (으)로."],
+        ["チャージ も できます か。", "Chaaji mo dekimasu ka?", "Can I also top it up here?", "충전도 할 수 있어요?",
+          "Topping up an IC card is チャージ (charge)."],
+        ["はい、 レジ で できます。", "Hai, reji de dekimasu.", "Yes, you can do it at the register.", "네, 계산대에서 할 수 있어요."],
+      ],
+      [
+        ["ポイントカード", "pointo kaado", "point card", "포인트 카드"],
+        ["お[支払|しはら]い", "oshiharai", "payment", "결제"],
+        ["チャージ", "chaaji", "top-up", "충전"],
+        ["レジ", "reji", "register, checkout", "계산대"],
+      ],
+    ),
+    lesson(
+      "konbini-4",
+      "At the supermarket",
+      "Find items, spot discounts and ask for a bag.",
+      [
+        ["[卵|たまご] は どこ に あります か。", "Tamago wa doko ni arimasu ka?", "Where are the eggs?", "계란은 어디에 있어요?"],
+        ["[奥|おく] の [冷蔵|れいぞう] コーナー に あります。", "Oku no reizou koonaa ni arimasu.", "In the refrigerated section at the back.", "안쪽 냉장 코너에 있어요."],
+        ["この お[弁当|べんとう] は [割引|わりびき] です か。", "Kono obentou wa waribiki desu ka?", "Is this lunch box discounted?", "이 도시락 할인하나요?",
+          "Supermarkets put discount stickers on lunch boxes in the evening."],
+        ["はい、 [半額|はんがく] です。", "Hai, hangaku desu.", "Yes, it is half price.", "네, 반값이에요."],
+        ["レジ[袋|ぶくろ] は ご[利用|りよう] です か。", "Rejibukuro wa goriyou desu ka?", "Will you use a plastic bag?", "비닐봉지 필요하세요?",
+          "Bags cost a few yen in Japan, so staff always ask."],
+        ["[大|おお]きい [袋|ふくろ] を [一枚|いちまい] ください。", "Ookii fukuro o ichimai kudasai.", "One large bag, please.", "큰 봉투 한 장 주세요."],
+      ],
+      [
+        ["[卵|たまご]", "tamago", "egg", "계란"],
+        ["[割引|わりびき]", "waribiki", "discount", "할인"],
+        ["[半額|はんがく]", "hangaku", "half price", "반값"],
+        ["レジ[袋|ぶくろ]", "rejibukuro", "shopping bag", "비닐봉지"],
+      ],
+    ),
   ],
 };

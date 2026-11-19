@@ -16,6 +16,11 @@ export const trouble: Unit = {
       ["[交番|こうばん] は どこ です か。", "Kouban wa doko desu ka?", "Where is the police box?", "파출소가 어디예요?",
         "A 交番 is a small neighbourhood police post. Go there for lost items."],
       ["[駅|えき] の [前|まえ] に あります。", "Eki no mae ni arimasu.", "It is in front of the station.", "역 앞에 있어요."],
+    ], [
+      ["[財布|さいふ]", "saifu", "wallet", "지갑"],
+      ["[英語|えいご]", "eigo", "English", "영어"],
+      ["[交番|こうばん]", "kouban", "police box", "파출소"],
+      ["[前|まえ]", "mae", "in front of", "앞"],
     ]),
     lesson("trouble-2", "Feeling sick", "Say what hurts and whether you need help.", [
       ["[大丈夫|だいじょうぶ] です か。", "Daijoubu desu ka?", "Are you okay?", "괜찮으세요?"],
@@ -25,6 +30,11 @@ export const trouble: Unit = {
       ["[頭|あたま] が [痛|いた]い です。", "Atama ga itai desu.", "I have a headache.", "머리가 아파요."],
       ["[救急車|きゅうきゅうしゃ] を [呼|よ]びましょう か。", "Kyuukyuusha o yobimashou ka?", "Shall I call an ambulance?", "구급차 부를까요?"],
       ["いいえ、 [少|すこ]し [休|やす]めば [大丈夫|だいじょうぶ] です。", "Iie, sukoshi yasumeba daijoubu desu.", "No, I will be fine if I rest a little.", "아니요, 조금 쉬면 괜찮아요."],
+    ], [
+      ["[気分|きぶん]", "kibun", "how you feel", "컨디션"],
+      ["[頭|あたま]", "atama", "head", "머리"],
+      ["[痛|いた]い", "itai", "painful, hurts", "아프다"],
+      ["[救急車|きゅうきゅうしゃ]", "kyuukyuusha", "ambulance", "구급차"],
     ]),
   ],
 };

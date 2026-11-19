@@ -15,6 +15,11 @@ export const transport: Unit = {
       ["あの [券売機|けんばいき] で [買|か]えます。", "Ano kenbaiki de kaemasu.", "You can buy one at that ticket machine.", "저 발매기에서 살 수 있어요."],
       ["[次|つぎ] の [電車|でんしゃ] は [何時|なんじ] です か。", "Tsugi no densha wa nanji desu ka?", "What time is the next train?", "다음 전철은 몇 시예요?"],
       ["[十時|じゅうじ] [五分|ごふん] です。", "Juuji gofun desu.", "It is 10:05.", "10시 5분이에요."],
+    ], [
+      ["[電車|でんしゃ]", "densha", "train", "전철"],
+      ["[切符|きっぷ]", "kippu", "ticket", "표"],
+      ["[券売機|けんばいき]", "kenbaiki", "ticket machine", "발매기"],
+      ["[次|つぎ]", "tsugi", "next", "다음"],
     ]),
     lesson("transport-2", "In a taxi", "Tell the driver where to go and where to stop.", [
       ["どちら まで です か。", "Dochira made desu ka?", "Where to?", "어디까지 가세요?"],
@@ -25,6 +30,11 @@ export const transport: Unit = {
       ["ここ で [止|と]めて ください。", "Koko de tomete kudasai.", "Please stop here.", "여기서 세워 주세요."],
       ["はい、 かしこまりました。", "Hai, kashikomarimashita.", "Certainly.", "네, 알겠습니다.",
         "Very polite 'understood', used by staff. You would say わかりました."],
+    ], [
+      ["[住所|じゅうしょ]", "juusho", "address", "주소"],
+      ["[空港|くうこう]", "kuukou", "airport", "공항"],
+      ["ぐらい", "gurai", "about, roughly", "정도"],
+      ["[止|と]めて", "tomete", "stop (please)", "세워"],
     ]),
   ],
 };

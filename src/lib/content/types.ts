@@ -22,6 +22,20 @@ export interface Line {
   note?: string;
 }
 
+/**
+ * One word worth knowing before a lesson starts. Shown on the lesson's
+ * "Key particles & words" preview card (src/components/lesson/LessonIntro.tsx).
+ */
+export interface KeyWord {
+  /** Japanese in the app's markup format, e.g. "[銀行|ぎんこう]". */
+  jp: string;
+  romaji: string;
+  /** Meaning in English. Empty for words picked automatically from AI lessons. */
+  en: string;
+  /** Meaning in Korean. Empty for words picked automatically from AI lessons. */
+  ko: string;
+}
+
 export interface Lesson {
   /** Stable id used in URLs and in the database. Never change an id. */
   id: string;
@@ -29,6 +43,11 @@ export interface Lesson {
   /** One line on what you can do after this lesson. */
   goal: string;
   lines: Line[];
+  /**
+   * Vocabulary to preview before the lesson. Optional: AI-generated lessons
+   * do not have it, and the preview then picks the kanji words itself.
+   */
+  keyWords?: KeyWord[];
 }
 
 export interface Unit {

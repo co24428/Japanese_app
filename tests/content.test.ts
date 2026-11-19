@@ -21,6 +21,13 @@ describe("built-in curriculum", () => {
     for (const l of lessons) expect(l.id).toMatch(/^[a-z0-9-]+$/);
   });
 
+  it("still contains every lesson that existed before (saved progress depends on ids)", () => {
+    const ids = new Set(lessons.map((l) => l.id));
+    const original = ["greetings", "konbini", "restaurant", "directions", "transport", "shopping", "hotel", "smalltalk", "work", "trouble"]
+      .flatMap((unit) => [`${unit}-1`, `${unit}-2`]);
+    for (const id of original) expect(ids.has(id)).toBe(true);
+  });
+
   for (const lesson of lessons) {
     describe(lesson.id, () => {
       it("is a dialogue of ask/answer pairs", () => {
@@ -37,6 +44,16 @@ describe("built-in curriculum", () => {
           // The hand-written romaji must spell out the furigana reading.
           expect(romajiMatchesKana(line.romaji, kanaReading(line.jp))).toBe(true);
         });
+      });
+
+      it("has valid preview key words", () => {
+        expect(lesson.keyWords?.length ?? 0).toBeGreaterThanOrEqual(3);
+        for (const word of lesson.keyWords ?? []) {
+          expect(validateMarkup(word.jp), word.jp).toEqual([]);
+          expect(word.en.trim(), word.jp).not.toBe("");
+          expect(word.ko.trim(), word.jp).not.toBe("");
+          expect(romajiMatchesKana(word.romaji, kanaReading(word.jp)), `${word.jp} / ${word.romaji}`).toBe(true);
+        }
       });
     });
   }

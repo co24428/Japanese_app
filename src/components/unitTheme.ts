@@ -15,6 +15,10 @@ const HUES: Record<string, number> = {
   smalltalk: 175,
   work: 255,
   trouble: 15,
+  "street-walk": 105,
+  "salon-shopping": 320,
+  "bank-post": 75,
+  "pharmacy-clinic": 160,
 };
 
 /** Use as `style={unitStyle(unit.id)}` on the element that holds the colour. */

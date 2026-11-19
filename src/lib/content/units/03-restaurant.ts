@@ -16,6 +16,11 @@ export const restaurant: Unit = {
       ["ラーメン を [一|ひと]つ ください。", "Raamen o hitotsu kudasai.", "One ramen, please.", "라멘 하나 주세요."],
       ["お[飲|の]み[物|もの] は いかが です か。", "Onomimono wa ikaga desu ka?", "Would you like something to drink?", "음료는 어떠세요?"],
       ["お[水|みず] を お[願|ねが]いします。", "Omizu o onegaishimasu.", "Water, please.", "물 부탁드립니다."],
+    ], [
+      ["[二人|ふたり]", "futari", "two people", "두 명"],
+      ["[注文|ちゅうもん]", "chuumon", "order", "주문"],
+      ["お[飲|の]み[物|もの]", "onomimono", "drink", "음료"],
+      ["お[水|みず]", "omizu", "water", "물"],
     ]),
     lesson("restaurant-2", "Recommendations and the bill", "Ask what is good and ask for the check.", [
       ["おすすめ は [何|なん] です か。", "Osusume wa nan desu ka?", "What do you recommend?", "추천 메뉴는 뭐예요?"],
@@ -25,6 +30,11 @@ export const restaurant: Unit = {
       ["はい、 [少々|しょうしょう] お[待|ま]ち ください。", "Hai, shoushou omachi kudasai.", "Certainly, one moment, please.", "네, 잠시만 기다려 주세요."],
       ["[別々|べつべつ] に [払|はら]えます か。", "Betsubetsu ni haraemasu ka?", "Can we pay separately?", "따로따로 계산할 수 있어요?"],
       ["はい、 できます。", "Hai, dekimasu.", "Yes, you can.", "네, 가능합니다."],
+    ], [
+      ["おすすめ", "osusume", "recommendation", "추천"],
+      ["[定食|ていしょく]", "teishoku", "set meal", "정식"],
+      ["お[会計|かいけい]", "okaikei", "the bill", "계산"],
+      ["[別々|べつべつ]", "betsubetsu", "separately", "따로따로"],
     ]),
   ],
 };

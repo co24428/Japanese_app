@@ -16,6 +16,11 @@ export const hotel: Unit = {
       ["[朝食|ちょうしょく] は [何時|なんじ] から です か。", "Choushoku wa nanji kara desu ka?", "What time does breakfast start?", "조식은 몇 시부터예요?"],
       ["[七時|しちじ] から [十時|じゅうじ] まで です。", "Shichiji kara juuji made desu.", "From seven to ten.", "7시부터 10시까지입니다.",
         "から ... まで = from ... until, same order as Korean 부터 ... 까지."],
+    ], [
+      ["[予約|よやく]", "yoyaku", "reservation", "예약"],
+      ["[二泊|にはく]", "nihaku", "two nights", "2박"],
+      ["[朝食|ちょうしょく]", "choushoku", "breakfast", "조식"],
+      ["[何時|なんじ]", "nanji", "what time", "몇 시"],
     ]),
     lesson("hotel-2", "During your stay", "Ask for the Wi-Fi password and leave your bags.", [
       ["ワイファイ の パスワード は [何|なん] です か。", "Waifai no pasuwaado wa nan desu ka?", "What is the Wi-Fi password?", "와이파이 비밀번호가 뭐예요?"],
@@ -25,6 +30,11 @@ export const hotel: Unit = {
       ["はい、 お[預|あず]かり します。", "Hai, oazukari shimasu.", "Yes, we will keep it for you.", "네, 맡아 드리겠습니다."],
       ["チェックアウト は [何時|なんじ] です か。", "Chekkuauto wa nanji desu ka?", "What time is check-out?", "체크아웃은 몇 시예요?"],
       ["[十一時|じゅういちじ] です。", "Juuichiji desu.", "It is 11 o'clock.", "11시입니다."],
+    ], [
+      ["パスワード", "pasuwaado", "password", "비밀번호"],
+      ["[荷物|にもつ]", "nimotsu", "luggage", "짐"],
+      ["[預|あず]かる", "azukaru", "keep, look after", "맡다"],
+      ["チェックアウト", "chekkuauto", "check-out", "체크아웃"],
     ]),
   ],
 };

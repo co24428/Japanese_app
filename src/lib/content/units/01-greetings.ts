@@ -18,6 +18,11 @@ export const greetings: Unit = {
       ["[私|わたし] は キム です。", "Watashi wa Kimu desu.", "I am Kim.", "저는 김입니다."],
       ["どこ から [来|き]ました か。", "Doko kara kimashita ka?", "Where are you from?", "어디에서 오셨어요?"],
       ["[韓国|かんこく] から [来|き]ました。", "Kankoku kara kimashita.", "I am from Korea.", "한국에서 왔습니다."],
+    ], [
+      ["[名前|なまえ]", "namae", "name", "이름"],
+      ["[私|わたし]", "watashi", "I, me", "저, 나"],
+      ["[韓国|かんこく]", "Kankoku", "Korea", "한국"],
+      ["[来|き]ました", "kimashita", "came", "왔습니다"],
     ]),
     lesson("greetings-2", "Through the day", "Greet people in the morning and when leaving.", [
       ["おはよう ございます。", "Ohayou gozaimasu.", "Good morning.", "안녕하세요. (아침 인사)"],
@@ -29,6 +34,11 @@ export const greetings: Unit = {
       ["お[先|さき]に [失礼|しつれい]します。", "Osaki ni shitsurei shimasu.", "Excuse me for leaving before you.", "먼저 실례하겠습니다.",
         "Said when you leave work before others."],
       ["お[疲|つか]れさま でした。", "Otsukaresama deshita.", "Thank you for your hard work.", "수고하셨습니다."],
+    ], [
+      ["[天気|てんき]", "tenki", "weather", "날씨"],
+      ["[元気|げんき]", "genki", "well, healthy", "건강함"],
+      ["[失礼|しつれい]", "shitsurei", "excuse me, rudeness", "실례"],
+      ["お[疲|つか]れさま", "otsukaresama", "thanks for your work", "수고"],
     ]),
   ],
 };
